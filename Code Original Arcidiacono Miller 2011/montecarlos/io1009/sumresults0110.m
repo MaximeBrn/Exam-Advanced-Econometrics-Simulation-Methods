@@ -1,3 +1,5 @@
+% addpath C:/Users/loicc/OneDrive/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/montecarlos/io1009
+cd 'C:/Users/loicc/OneDrive/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/montecarlos/io1009'
 clear
 
 B=[];
@@ -14,10 +16,10 @@ while j<7
         load sim6f5sWrong/bwrong
     end
     if j==3
-        load sim6f5sUpmod/bmodel
+        load sim6f5sUpmodinit/bmodel
     end
     if j==4
-        load sim6f5sUpdata/bdata
+        load sim6f5sUpdatainit/bdata
     end
     if j==5
         load sim6f5s2stage/bdata
