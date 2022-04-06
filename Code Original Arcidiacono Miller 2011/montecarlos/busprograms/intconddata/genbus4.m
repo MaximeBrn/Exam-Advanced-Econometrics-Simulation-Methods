@@ -1,0 +1,65 @@
+%bus data generation
+%adds another variable
+%change from orig folder to go with Jon's parameters for Z and X from 3_z
+
+function [Y,X,Z,Xstate,Zstate,State,FVT]=genbus(alpha,N,T,xtran,xtranc,xbin,zbin,xval,zval);
+
+Beta=alpha(4);
+Pi=alpha(5);
+eul=0.577215665;
+FV=zeros(xbin*zbin,2,T+10+1);
+
+t=T+10;
+while t>1
+    for s=0:1;
+        for z=1:zbin;
+            for x=1:xbin
+              adj=x+(z-1)*xbin;  
+              util1=alpha(1)+alpha(2)*xval(x)+alpha(3)*s+ xtran(adj,:)*FV((z-1)*xbin+1:z*xbin,s+1,t+1);
+              util0=xtran(1+(z-1)*xbin,:)*FV((z-1)*xbin+1:z*xbin,s+1,t+1);
+              FV(adj,s+1,t)=Beta*(log(exp(util1)+exp(util0)) + eul);
+              
+            end;   
+        end;
+    end;
+    t=t-1;
+end; 
+
+State=(rand(N,1)>Pi);
+Y=zeros(N,T+10);
+Zstate=ceil(length(zval)*rand(N,1));
+X=zeros(N,1);
+
+Xstate=ones(N,T+1+10);
+Draw=rand(N,T+10);
+Draw2=rand(N,T+10);
+Draw3=rand(N,T+10);
+Xstate=X+1;
+for n=1:N;
+    
+    Z(n,1)=zval(Zstate(n,1));
+    adj0=(Zstate(n)-1)*xbin+1;
+    z2=(Zstate(n)-1)*xbin+1;
+    z3=z2+xbin-1;
+    for t=1:T+10;
+        adj=Xstate(n,t)+(Zstate(n)-1)*xbin;
+        FVT(n,t)=(xtran(adj,:)*FV(z2:z3,State(n)+1,t+1))-(xtran(adj0,:)*FV(z2:z3,State(n)+1,t+1));
+        util1=alpha(1)+alpha(2)*X(n,t)+alpha(3)*State(n) + (xtran(adj,:)*FV(z2:z3,State(n)+1,t+1));
+        util0=(xtran(adj0,:)*FV(z2:z3,State(n)+1,t+1));
+        dem=exp(util1)+exp(util0);
+        p0=exp(util0)./dem;
+        p1=1-p0;
+        Y(n,t)=1-(Draw(n,t)<p0);
+        Xstate(n,t+1)=1+(Y(n,t)==1).*sum((Draw2(n,t)*ones(1,xbin-1))>xtranc(Xstate(n,t),1:xbin-1,Zstate(n,1)),2);
+        X(n,t+1)=xval(Xstate(n,t+1));
+    end;
+end;
+
+Y=Y(:,11:T+10);
+X=X(:,11:T+10);
+Xstate=Xstate(:,11:T+10);
+FVT=FVT(:,11:T+10);
+
+        
+
+    
