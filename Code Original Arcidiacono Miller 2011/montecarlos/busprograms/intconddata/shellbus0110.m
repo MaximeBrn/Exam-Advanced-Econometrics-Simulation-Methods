@@ -71,14 +71,14 @@ for MC=1:50;
     t2=[t2;t2];
     stemp=[zeros(N,1);ones(N,1)];
     
-    %estimating FIML
-    tic
-    
-    [bf]=fminunc('likebusML4',alphaf,o1,[Y;Y],stemp,N,T,[X;X],[Zstate;Zstate],[Xstate;Xstate],xtran,tbin,zbin,xbin,xval,Z);
-    tf1=toc
-    
-    Tf1=[Tf1;toc];
-    Bf1=[Bf1;bf']; 
+%     %estimating FIML
+%     tic
+%     
+%     [bf]=fminunc('likebusML4',alphaf,o1,[Y;Y],stemp,N,T,[X;X],[Zstate;Zstate],[Xstate;Xstate],xtran,tbin,zbin,xbin,xval,Z);
+%     tf1=toc
+%     
+%     Tf1=[Tf1;toc];
+%     Bf1=[Bf1;bf']; 
     %estimating with data ccps
         
     tic
