@@ -15,15 +15,17 @@
 
 ##########################################################################
 
-library(Rcpp)
+library(Rcpp,lib.loc = "C:/Program Files/R/R-4.1.3/library")
+library(RcppArmadillo,lib.loc = "C:/Program Files/R/R-4.1.3/library")
 
-source('C:/Users/loicc/OneDrive/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/wlogitd.R')
-source('C:/Users/loicc/OneDrive/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/wlogit.R')
-source('C:/Users/loicc/OneDrive/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/likebusML4.R')
-sourceCpp('C:/Users/loicc/OneDrive/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/genbus4.cpp')
-sourceCpp('C:/Users/loicc/OneDrive/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/fvdataBOTH.cpp')
-source('C:/Users/loicc/OneDrive/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/intcond.R')
-source('C:/Users/loicc/OneDrive/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/intcondP.R')
+source('C:/Users/Hp/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/wlogitd.R')
+source('C:/Users/Hp/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/wlogit.R')
+source('C:/Users/Hp/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/likebusML4.R')
+sourceCpp('C:/Users/Hp/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/genbus4.cpp')
+sourceCpp('C:/Users/Hp/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/fvdataBOTH.cpp')
+source('C:/Users/Hp/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/intcond.R')
+source('C:/Users/Hp/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/intcondP.R')
+source('C:/Users/Hp/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Methods/Code Original Arcidiacono Miller 2011/CODE R/Files/xgrid.R')
 
 set.seed(1)
 
@@ -86,9 +88,9 @@ while(MC <= MCiter){
   #generating the data 
   genbusout=genbusRcpp(alpha,N,T,xtran,xtrancRcpp,xbin,zbin,xval,zval)
   
-  Y=genbusout$Y
-  X=genbusout$X
-  Z=genbusout$Z
+  Y=genbusout$Y #replacement decision
+  X=genbusout$X #mileage data
+  Z=genbusout$Z #intrinsic characteristic of buses
   Xstate=genbusout$Xstate
   Zstate=genbusout$Zstate
   State=genbusout$State

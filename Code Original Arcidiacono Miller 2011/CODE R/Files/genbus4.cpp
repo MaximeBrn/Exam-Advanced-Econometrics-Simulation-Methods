@@ -43,8 +43,8 @@ List genbusRcpp(vec const& alpha,int N,int T,mat const& xtran,mat const& xtrancR
   }
 
   vec Statedraw = randu<vec>(N);
-  vec State = zeros<vec>(N);
-  State.elem(find(Statedraw>Pi)).ones();
+  vec State = zeros<vec>(N); 
+  State.elem(find(Statedraw>Pi)).ones(); //gives the states of each bus (1 or 2)
   mat Y = zeros<mat>(N,T+10);
   mat X = zeros<mat>(N,T+1+10);
   mat Xstate = ones<mat>(N,T+1+10);
