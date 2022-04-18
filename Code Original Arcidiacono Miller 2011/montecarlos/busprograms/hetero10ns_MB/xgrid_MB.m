@@ -5,8 +5,6 @@ function [xtran,xtranc]=xgrid(theta,xval);
 % theta is a value of x2
 % xval is all the possible values of x1t
 
-
-
 n=length(xval); 
 xub=[xval(2:n) ; inf]; % corresponds to x1_t+1
 xtran=zeros(n,n);
