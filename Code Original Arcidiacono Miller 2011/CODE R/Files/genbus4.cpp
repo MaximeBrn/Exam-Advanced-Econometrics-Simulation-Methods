@@ -88,8 +88,8 @@ List genbusRcpp(vec const& alpha,int N,int T,mat const& xtran,mat const& xtrancR
     Named("Y") = Y, // Return the decision (Y=0 if we replace)
     Named("X") = X, // X1_t
     Named("Z") = Z, // X2
-    Named("Xstate") = Xstate,
-    Named("Zstate") = Zstate,
-    Named("State") = State,
+    Named("Xstate") = Xstate,// Index of X in xval
+    Named("Zstate") = Zstate, // Index of Z in zval
+    Named("State") = State, // brand of the bus
     Named("FVT") = FVT);
 }
