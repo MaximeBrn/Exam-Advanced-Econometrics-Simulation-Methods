@@ -23,6 +23,7 @@ path = 'C:/Users/33689/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Me
 
 source(paste(path,'xgrid.R',sep=""))
 source(paste(path,'wlogitd.R',sep=""))
+source(paste(path,'wlogit.R',sep=""))
 source(paste(path,'likebusML4.R',sep=""))
 sourceCpp(paste(path,'genbus4.cpp',sep=""))
 sourceCpp(paste(path,'fvdataBOTH.cpp',sep=""))
@@ -38,7 +39,7 @@ tol=.0000001
 
 MCiter=3       #Monte Carlo iterations
 FIML = FALSE   #estimate FIML too? (it takes much longer than CCP)
-hetero = FALSE #Is heterogeneity observed? FALSE = cols 1 and 2 TRUE = cols 5 and 6
+hetero = TRUE #Is heterogeneity observed? FALSE = cols 1 and 2 TRUE = cols 5 and 6
 T=200          #Time periods
 if(hetero) T=T/10
 N=1000        #Observations per time period
