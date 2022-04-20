@@ -21,6 +21,8 @@ library(readxl)
 library(zoo) # To retreat data
 library(dplyr)
 library(reshape2)
+library(truncnorm)
+
 
 # Set your path up to Exam-Advanced-Econometrics-Simulation-Methods
 #path = 'D:/2021-22 Academic Year/IPP/Advanced Econometrics - Simulation Methods/'
@@ -50,16 +52,19 @@ df_rust$mileage <- floor(df_rust$mileage/1000) # express mileage in thousands
 df_rust$decision <- df_rust$decision+1 # Replace decision values 0 -> 1
 df_rust$decision[df_rust$decision==2] <- 0 # Replace decision values 2 -> 0
 
-# For each bus, compute the total number of observations available
+# For each bus, compute the total number of observations available and if there is a replacement
 df_rust <- df_rust %>%
   group_by(Bus_ID) %>% # for each bus 
   mutate(n_periods = n()) %>% # store the number of observations in n_periods
+  mutate(remplacement = sum(decision)<n()) %>%
   ungroup()
 
+# Keep bus with replacement
+df_rust <- df_rust[df_rust$remplacement==TRUE,]
 
 # Define the period and duration for the estimation
 t_start=5 # first period to be considered
-T=30 # number of periods we take into account
+T=100 # number of periods we take into account
 t_min=t_start+T+5 # the bus must be operated for at least for t_min period
 
 # Filter the data frame to keep only the buses that match our period selection
@@ -70,7 +75,11 @@ df_rust <- df_rust[df_rust$period<=t_start+T-1,] # Keep only the T periods after
 set.seed(1)
 
 #Initial parameter values
-alpha=c(3.59516399,-0.02021869,4.49516434,-0.04755573,.4) #Intercept (theta_0), mileage (theta_1), heterogeneity (theta_2), discount factor (beta), Pi
+# #Intercept (theta_0), mileage (theta_1), heterogeneity (theta_2), discount factor (beta), Pi
+# Fonctionne : alpha=c(30,-0.001,4,0.9,.4)
+alpha=c(7.21661496,-0.01632606,5.39823666,0.01104702,.4)
+
+
 
 tol=.0000001
 
@@ -160,7 +169,7 @@ if(hetero){
   y2=c(y2,y2) # decision
   x2=c(x2,x2) # mileage
   z2=c(z2,z2) # x2
-  s2=c(rep(0,N*T),rep(1,N*T)) # restated because s is unobserved by the econometrician
+  s2=c(rep(0,N*T),rep(1,N*T)) # restated (because s is unobserved by the econometrician)
   t2=c(t2,t2) 
   stemp=c(rep(0,N),rep(1,N)) # temporary value for s
 }
