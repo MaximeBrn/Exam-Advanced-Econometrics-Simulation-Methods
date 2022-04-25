@@ -23,8 +23,9 @@ vec fvdataRcpp(vec const& b1,mat const& RX1,int tbin,int xbin,vec const& Zstate,
       tvec[0] = 1;
       tvec[1] = t/10.;
       tvec[2] = tvec[1]*tvec[1];
-      U1=kron(trans(tvec),join_rows(RX1,s*RX1))*b1;
-      FV1(span(),span(s),span(t-1)) = -log(exp(U1)/(1+exp(U1))); //replaced call to 'plogit'
+      U1=kron(trans(tvec),join_rows(RX1,s*RX1))*b1;  
+      
+      FV1(span(),span(s),span(t-1)) = -log(exp(U1)/(1+exp(U1))); // fitted value of the reduced form logit
     }
   }
   
