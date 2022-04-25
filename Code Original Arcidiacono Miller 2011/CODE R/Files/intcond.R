@@ -1,9 +1,13 @@
 intcond=function(b,like,X){
-  U1=X%*%b
-  p=exp(U1)/(1+exp(U1))
-  p=cbind(p,1-p)
+  # x = regressors at time t=1
+  # like = base = Likelihood by bus and by brand
   
-  Like = -sum(log(rowSums(p*like)))
+  U1=X%*%b # W0*delta : cost of keeping at t=1 (supp p.13)
+  p=exp(U1)/(1+exp(U1)) # pi(2|x1) (supp p.13)
+  p=cbind(p,1-p) # to weight the column of like
+  
+  
+  Like = -sum(log(rowSums(p*like))) # objective of delta(m+1) (supp p. 13)
   
   Like
 }
