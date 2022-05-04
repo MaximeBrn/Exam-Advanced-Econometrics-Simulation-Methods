@@ -1,5 +1,6 @@
 # Exam Advanced Econometrics Simulation Methods
 
+REPORT --> LINK OVERLEAF : https://www.overleaf.com/9595686392zdgkkwqgstnb
 
 ### Replication files
 - See https://github.com/waynejtaylor/Single-Agent-Dynamic-Choice/blob/master/AM2011Table1cols2356.R
