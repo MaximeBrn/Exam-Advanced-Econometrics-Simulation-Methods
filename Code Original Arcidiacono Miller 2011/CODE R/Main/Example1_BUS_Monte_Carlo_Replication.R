@@ -17,14 +17,15 @@
 
 ################################################################################
 # This code is from Wayne Taylor
-# Link to the Github :
-# This is a conversion to R of the authors code available on Matlab
-# Link to authors' code :
-# The code replicate Table 1 columns 2,3,4 and 6
+# Link to the Github : https://github.com/waynejtaylor/Single-Agent-Dynamic-Choice/blob/master/AM2011Table1cols2356.R
+# The intent is to replicate the results of Arcidiacono and Miller (2011)
+# This is a conversion to R of the authors code that is available on Matlab
+# Link to authors' code : https://www.econometricsociety.org/publications/econometrica/2011/11/01/conditional-choice-probability-estimation-dynamic-discrete
+# Wayne's code replicate Table 1 columns 2,3,5 and 6
 
 # Maxime Brun, Loïc Cantin and Thibauld Ingrand
-# Only replicate columns 3 and 6 : remove FIML part
-# Add comments to the code
+# we removed FIML results so that the code only replicates columns 3 and 6 
+# We add comments to the code
 
 ###############################################################################
 
@@ -36,7 +37,6 @@ path = 'C:/Users/33689/Documents/GitHub/Exam-Advanced-Econometrics-Simulation-Me
 source(paste(path,'xgrid.R',sep="")) # Function used to compute the transition matrix
 source(paste(path,'wlogitd.R',sep="")) # Function used for reduced form logit
 source(paste(path,'wlogit.R',sep="")) # Function maximized by the structural parameters
-source(paste(path,'likebusML4.R',sep="")) # ONLY USED FOR FIML
 sourceCpp(paste(path,'genbus4.cpp',sep="")) # Function used to generate the data
 sourceCpp(paste(path,'fvdataBOTH.cpp',sep="")) # Function used to compute value function part of the likelihood
 source(paste(path,'intcond.R',sep="")) # Used to compute initial conditions
@@ -49,20 +49,18 @@ set.seed(1)
 alpha=c(2,-.15,1,.9,.4) #Intercept (theta_0), mileage (theta_1), heterogeneity (theta_2), discount factor (beta), Pi
 
 # Tolerance of the EM Algorithm
-tol=.0000001
+tol=.001 
 
 # Code Specification
-MCiter=3       # Number of Monte Carlo iterations
+MCiter=1       # Number of Monte Carlo iterations
 hetero = TRUE   # Is heterogeneity unobserved? FALSE = column 3 ; TRUE = column 6
-T=200          #Time periods
+T=200          # Time periods
 if(hetero) T=T/10 # If heterogeneity is unobserved, reduce the time period
 N=1000        # Observations per time period
 
 # Ouput vectors General
 Bccp=NULL #CCP parameter storage
 Tccp=NULL #CCP timing
-Bfl=NULL  #FIML parameter storage
-Tfl=NULL  #FIML timing
 
 # Additional output vectors (when we allow for unobserved heterogeneity)
 if(hetero){
@@ -137,23 +135,6 @@ while(MC <= MCiter){
     stemp=c(rep(0,N),rep(1,N))
   }
   
-  #estimating FIML----
-  if(FIML){
-    
-    tic = proc.time()[3] #start the timer
-    
-    if(!hetero){
-      bfl=optim(alphaf,likebusML4,Y=Y,State=s2,N=N,T=T,X=X,Zstate=Zstate,Xstate=Xstate,xtran=xtran,tbin=tbin,zbin=zbin,xbin=xbin,xval=xval,Z=Z)
-    } else {
-      bfl=optim(alphaf,likebusML4,Y=y2,State=stemp,N=N,T=T,X=x2,Zstate=c(Zstate,Zstate),Xstate=c(Xstate,Xstate),xtran=xtran,tbin=tbin,zbin=zbin,xbin=xbin,xval=xval,Z=Z)
-    }
-    
-    toc = proc.time()[3]-tic
-    
-    Tfl=c(Tfl,toc)
-    Bfl=rbind(Bfl,bfl)
-  }
-  
   # Estimating with data CCPs
   
   tic = proc.time()[3] #start the timer
@@ -169,10 +150,10 @@ while(MC <= MCiter){
   } else { # if the brand is unobserved
     PType=.5*rep(1,2*N*T)
     oPType=rep(0,2*N*T)
-    Pi2=c(.5,.5)  
+    Pi2=c(.5,.5)  # Prior probability
     
     b1 = rep(0,ncol(xx))
-    b1 = optim(b1,wlogitd,Y=(y2==0),X=xx,P=PType,method="BFGS")$par
+    b1 = optim(b1,wlogitd,Y=(y2==0),X=xx,P=PType,method="BFGS")$par # coefficient estimates
     # For a binomial GLM prior weights are used to give the number of trials when the response is the proportion of successes
     # So we cannot send them into the "weights" argument
   }
@@ -190,7 +171,7 @@ while(MC <= MCiter){
   
   if(!hetero){ # s observed
     bccp = glm(y2~cbind(xccp,fvt1)-1,family='binomial')$coef # Use a GLM
-  } else { # s unobersevd
+  } else { # s unobserved --> EM ALGORIHM
     
     # When s in unobserved, we need the EM algorithm
     # Starting the EM algorithm
@@ -199,12 +180,14 @@ while(MC <= MCiter){
     
     bccp = alphac # Initial parameter values
     
-    intcondX=cbind(rep(1,N), X[1:N,1],Z[1:N,1]) #
+    intcondX=cbind(rep(1,N), X[1:N,1],Z[1:N,1]) # Regressors at time 1
     binit=rep(0,3) # Initial value of b1
     
     cond=0 
     lp=NULL
     while(cond==0){
+      
+      # EXPECTATION
       
       # Updating PType
       ## first getting the type-specific likelihoods
@@ -215,27 +198,35 @@ while(MC <= MCiter){
       U1 = cbind(xccp,fvt1)%*%bccp # is v2-v1
       Like = (y2*exp(U1)+(1-y2))/(1+exp(U1)) # N*T*2 vector
       
-      Like2=array(Like,c(N,T,2))
-      base=apply(Like2,c(1,3),prod)
+      Like2=array(Like,c(N,T,2)) # Likelihood contributions by bus, time and brand : N*T*S
+      base=apply(Like2,c(1,3),prod) # Likelihood contribution by bus and brand : N*S
       
-      #now getting the initial condition parameters 
-      intcond_optim=optim(binit,intcond,like=base,X=intcondX,method="BFGS")
-      binit = intcond_optim$par
-      lp=c(lp,intcond_optim$value)
+      # UPDATE the m-th pi(x|x)
+      # Now getting the initial condition parameters (see supplemental B.1.4)
       
-      #and the PType's
-      PType=intcondP(binit,base,intcondX)
-      PType=kronecker(rep(1,T),PType)
-      PType=as.vector(PType)
+      intcond_optim=optim(binit,intcond,like=base,X=intcondX,method="BFGS") 
+      binit = intcond_optim$par # Obtain delta(m+1) => to be used to update the m-th pi(s|x)
+      lp=c(lp,intcond_optim$value) # Value of the likelihood
       
-      #estimating reduced form logit 
-      b1 = optim(b1,wlogitd,Y=(y2==0),X=xx,P=PType,method="BFGS")$par   
+      # UPDATE the m-th q_ns
+      # And the PType's
       
-      #calculating fv terms
-      fvt1=fvdataRcpp(b1,RX1,tbin,xbin,Zstate,Xstate,xtran,N,T,rep(1,N),hetero)
+      PType=intcondP(binit,base,intcondX) # update q_ns : N bus * 2 states
+      PType=kronecker(rep(1,T),PType) # q_nst : N bus * 2 states * T periods
+      PType=as.vector(PType) # q_nst as a vector
       
-      # Structural paremeters
-      bccp = optim(bccp,wlogit,Y=y2,X=cbind(xccp,fvt1),P=PType,method="BFGS")$par 
+      # UPDATE the m_th p1(x,s)
+      # Estimating reduced form logit (See supplemental B.1.3)
+      b1 = optim(b1,wlogitd,Y=(y2==0),X=xx,P=PType,method="BFGS")$par # y2==0 <=> d1t=1. See supplemental B.1.3.
+      # b1 will be used to obtain p1 in the likelihood
+      
+      
+      # MAXIMIZATION
+      # Calculating fv terms --> The term multiplied by beta that involes p1
+      fvt1=fvdataRcpp(b1,RX1,tbin,xbin,Zstate,Xstate,xtran,N,T,rep(1,N),hetero) #  Value function part of the likelihood
+      
+      # Structural parameters
+      bccp = optim(bccp,wlogit,Y=y2,X=cbind(xccp,fvt1),P=PType,method="BFGS")$par # Last step of the algorithm
       
       #CHECKING CONVERGENCE
       if(j>26){
@@ -254,8 +245,8 @@ while(MC <= MCiter){
   
   toc = proc.time()[3]-tic
   
-  Tccp=c(Tccp,toc)
-  Bccp=rbind(Bccp,bccp)
+  Tccp=c(Tccp,toc) # Store the computation time
+  Bccp=rbind(Bccp,bccp) # Store the coefficient estimates
   
   if(hetero){
     Iccp=c(Iccp,j)
