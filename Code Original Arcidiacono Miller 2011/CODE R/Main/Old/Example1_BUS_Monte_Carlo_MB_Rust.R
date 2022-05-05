@@ -15,7 +15,7 @@
 
 ##########################################################################
 
-
+clear
 library(Rcpp)
 library(readxl)
 library(zoo) # To retreat data
@@ -84,14 +84,14 @@ set.seed(1)
 # Fonctionne : alpha=c(30,-0.001,4,0.9,.4)
 #alpha=c(7.21661496,-0.01632606,1,0.01104702,.4)
 
-alpha=c(2,-0.01,4,0.9,.5)
-
+#alpha=c(10,-0.001,-0.43,0.8,.5)
+alpha=c(20,-0.001,-10,0.1,.5)
 
 # tol=.0000001
-tol=.000001
+tol=.0001
 
 FIML = FALSE   #estimate FIML too? (it takes much longer than CCP)
-hetero = TRUE #Is heterogeneity observed? FALSE = cols 1 and 2 TRUE = cols 5 and 6
+hetero = TRUE  #Is heterogeneity unobserved? FALSE = cols 1 and 2 TRUE = cols 5 and 6
 
 # Bccp=NULL #CCP parameter storage
 # Tccp=NULL #CCP timing
@@ -119,7 +119,7 @@ xbin=length(xval) # cardinal of x1 support
 xtran=matrix(0,zbin*xbin,xbin) # to store the probability
 xtranc=array(0,c(xbin,xbin,zbin)) # to store the cumulative distribution
 for(z in 1:zbin){ # Here we have only 1 value for z
-  temp=xgrid_Rust(zval[z],xval)  # call xgrid function
+  temp=xgrid_Rust(xval)  # call xgrid function
   xtran[(1+(z-1)*xbin):(z*xbin),] = temp$xtran # store probability transition
   xtranc[,,z] = temp$xtranc # store cumulated transition
 }
@@ -135,7 +135,9 @@ tbin=xbin*zbin # equal to xbin here because zbin=1
 
 #z and x values for each state
 zvalr=kronecker(zval,rep(1,xbin)) # we repeat xbin times xval
-xvalr=kronecker(rep(1,zbin),xval)/10 # equal to xval because only 1 zval
+#xvalr=kronecker(rep(1,zbin),xval)/10 # equal to xval because only 1 zval
+xvalr=kronecker(rep(1,zbin),xval) # equal to xval because only 1 zval
+
 
 #data for reduced form logits
 #covers the state space
@@ -301,9 +303,9 @@ if(!hetero){
     #calculating fv terms
     fvt1=fvdataRcpp_Rust(b1,RX1,tbin,xbin,Zstate,Xstate,xtran,N,T,rep(1,N),hetero)
     
-    
     # Structural paremeters
     bccp = optim(bccp,wlogit,Y=y2,X=cbind(xccp,fvt1),P=PType,method="BFGS")$par 
+    #bccp = optim(bccp,wlogit,Y=y2,X=cbind(xccp,fvt1),P=PType,method="L-BFGS-B",lower=c(-Inf, -Inf, -Inf, 0.5), upper=c(Inf, Inf, Inf, 0.99))$par 
     
     #CHECKING CONVERGENCE
     if(j>26){
