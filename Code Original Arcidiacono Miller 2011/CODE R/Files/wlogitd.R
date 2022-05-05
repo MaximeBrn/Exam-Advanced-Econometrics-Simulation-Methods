@@ -1,3 +1,5 @@
+# Flexible logit where the dependent variable is d1t
+# See supplemental B.1.3
 wlogitd=function(b,Y,X,P,LikOnly=TRUE){
   U1=X%*%b
   Like=t(P)%*%(log(1+exp(U1))-Y*U1)

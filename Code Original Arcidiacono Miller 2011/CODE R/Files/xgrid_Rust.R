@@ -1,4 +1,4 @@
-xgrid_Rust=function(theta,xval){
+xgrid_Rust=function(xval){
   
   n=length(xval)
   xub=c(xval[2:n],Inf) #
