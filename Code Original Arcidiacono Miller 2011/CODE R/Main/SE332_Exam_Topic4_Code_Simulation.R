@@ -36,7 +36,7 @@ alpha=c(2,-.15,1,.9,.4) #Intercept (theta_0), mileage (theta_1), heterogeneity (
 tol=.001 
 
 # Code Specification
-MCiter=2       # Number of Monte Carlo iterations
+MCiter=50       # Number of Monte Carlo iterations
 hetero = FALSE   # Is heterogeneity unobserved? FALSE = column 3 ; TRUE = column 6
 T=200          # Time periods
 if(hetero) T=T/10 # If heterogeneity is unobserved, reduce the time period
@@ -245,9 +245,9 @@ Bccp
 if(hetero){
   Res <- as.data.frame(Bccp)
   colnames(Res) <- c("theta_0","theta_1","theta_2","beta")
-  stargazer(Res,type="latex",out='Simulation_unobserved.tex',flip=TRUE,omit.summary.stat=c("min","max"))
+  stargazer(Res,title="Simulation - s unobserved",type="latex",out='Simulation_unobserved.tex',flip=TRUE,omit.summary.stat=c("min","max"))
   }else{
   Res <- as.data.frame(Bccp)
   colnames(Res) <- c("theta_0","theta_1","theta_2","beta")
-  stargazer(Res,type="latex",out='Simulation_observed.tex',flip=TRUE,omit.summary.stat=c("min","max"))
+  stargazer(Res,title="Simulation - s observed",type="latex",out='Simulation_observed.tex',flip=TRUE,omit.summary.stat=c("min","max"))
   }

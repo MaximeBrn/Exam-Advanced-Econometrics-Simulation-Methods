@@ -69,11 +69,11 @@ set.seed(1)
 
 #Initial parameter values
 
-alpha=c(7,-0.01,-0.1,0.5,0.35) # Intercept (theta_0), mileage (theta_1), heterogeneity (theta_2), discount factor (beta), Pi
+alpha=c(7,-0.01,-0.1,0,0.35) # Intercept (theta_0), mileage (theta_1), heterogeneity (theta_2), discount factor (beta), Pi
 
 tol=.001
 
-hetero = FALSE  #Is heterogeneity unobserved? FALSE = cols 1 and 2 TRUE = cols 5 and 6
+hetero = TRUE  #Is heterogeneity unobserved? FALSE = cols 1 and 2 TRUE = cols 5 and 6
 
 # Support for x1 and x2
 
@@ -264,10 +264,10 @@ Bccp=rbind(Bccp,bccp)
 if(hetero){
   Res <- as.data.frame(Bccp)
   colnames(Res) <- c("theta_0","theta_1","theta_2")
-  stargazer(Res,type="latex",out=paste("Application_unobserved_nobeta_",beta*100,".tex",sep=""),flip=TRUE,omit.summary.stat=c("n","min","max"))
+  stargazer(Res,title=paste("Application on Rust's data - beta=",beta," - engine unobserved",sep=""),type="latex",out=paste("Application_unobserved_nobeta_",beta*100,".tex",sep=""),flip=TRUE,omit.summary.stat=c("sd","n","min","max"))
 } else {
   Res <- as.data.frame(Bccp)
   colnames(Res) <- c("theta_0","theta_1","theta_2")
-  stargazer(Res,type="latex",out=paste("Application_observed_nobeta_",beta*100,".tex",sep=""),flip=TRUE,omit.summary.stat=c("n","min","max"))
+  stargazer(Res,title=paste("Application on Rust's data - beta=",beta," - engine observed",sep=""),type="latex",out=paste("Application_observed_nobeta_",beta*100,".tex",sep=""),flip=TRUE,omit.summary.stat=c("sd","n","min","max"))
 }
 

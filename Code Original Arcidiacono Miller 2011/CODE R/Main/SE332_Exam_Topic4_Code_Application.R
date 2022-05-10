@@ -78,7 +78,7 @@ alpha=c(7,-0.01,-0.1,0.1,0.35) # Intercept (theta_0), mileage (theta_1), heterog
 
 tol=.0001 # Tolerance of the EM algorithm
 
-hetero = FALSE  #Is heterogeneity unobserved? FALSE = cols 1 and 2 TRUE = cols 5 and 6
+hetero = TRUE  #Is heterogeneity unobserved? FALSE = cols 1 and 2 TRUE = cols 5 and 6
 
 # Support for x1 and x2
 
@@ -265,11 +265,11 @@ Bccp=rbind(Bccp,bccp)
 if(hetero){
   Res <- as.data.frame(Bccp)
   colnames(Res) <- c("theta_0","theta_1","theta_2","beta")
-  stargazer(Res,type="latex",out='Application_unobserved.tex',flip=TRUE,omit.summary.stat=c("sd","n","min","max"))
+  stargazer(Res,title="Application on Rust's data - engine unobserved",type="latex",out='Application_unobserved.tex',flip=TRUE,omit.summary.stat=c("sd","n","min","max"))
 } else {
   Res <- as.data.frame(Bccp)
   colnames(Res) <- c("theta_0","theta_1","theta_2","beta")
-  stargazer(Res,type="latex",out='Application_observed.tex',flip=TRUE,omit.summary.stat=c("sd","n","min","max"))
+  stargazer(Res,title="Application on Rust's data - engine observed",type="latex",out='Application_observed.tex',flip=TRUE,omit.summary.stat=c("sd","n","min","max"))
 }
 
 
